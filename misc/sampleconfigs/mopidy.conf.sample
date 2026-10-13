@@ -45,3 +45,23 @@ client_secret = %spotify_client_secret%
 #search_artist_count = 10
 #search_track_count = 50
 #toplist_countries =
+
+# Install with: sudo python3 -m pip install 'git+https://example.com/mopidy-audiobookshelf.git'
+# The extension stays off until this block is uncommented. A blank hostname
+# does not stop Mopidy. Prefer an API token; username/password is retried
+# after boot if the network is not up yet.
+#[audiobookshelf]
+#enabled = true
+#hostname = https://audiobookshelf.example.com
+#token =
+#username =
+#password =
+#libraries =
+#resume = true
+#sync_interval = 15
+#device_name = Phoniebox
+#verify_ssl = true
+#cache_ttl = 300
+#cache = false
+#cache_limit = 4096
+#cache_dir =

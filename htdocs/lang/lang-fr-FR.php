@@ -128,6 +128,8 @@ $lang['cardRegisterErrorExistingAndNew'] = "<p>This is too much! Either choose a
 $lang['cardRegisterErrorExistingFolder'] = "<p>A folder named with the same name already exists! Chose a different one.</p>";
 $lang['cardRegisterErrorSuggestFolder'] = "A folder name for the stream needs to be created. Below in the form I made a suggestion.";
 $lang['cardRegisterErrorConvertSpotifyURL'] = "URL Spotify incorrecte, elle a été convertie au bon format";
+$lang['cardRegisterErrorConvertABSURL'] = "Adresse web Audiobookshelf convertie en URI audiobookshelf:";
+$lang['cardRegisterErrorABSFolder'] = "Impossible de créer le dossier Audiobookshelf.";
 $lang['cardRegisterStream2Card'] = "Le stream est lié à la carte.";
 $lang['cardRegisterFolder2Card'] = "Le dossier audio est désormais lié à une carte.";
 $lang['cardRegisterDownloadingYT'] = "<p>Piste YouTube en cours de téléchargement. Cela peut prendre plusieurs minutes. Log dans le fichier \"youtube-download.log\".</p>";
@@ -157,6 +159,9 @@ $lang['cardFormStreamPlaceholderPlusSpotify'] = "spotify:album/artist/playlist/t
 $lang['cardFormStreamHelp'] = "Add the URL for spotify, podcast, web radio, stream or other online media";
 $lang['cardFormStreamTypeSelectDefault'] = "Select type";
 $lang['cardFormStreamTypeHelp'] = "Select the type you are adding";
+$lang['cardFormABSLegend'] = "Audiobookshelf";
+$lang['cardFormABSSearchLabel'] = "Rechercher un livre audio";
+$lang['cardFormABSSearchHelp'] = "Recherche dans vos bibliothèques Audiobookshelf. Un résultat remplit l'URL du flux et propose un nom de dossier.";
 
 $lang['cardFormYTLegend'] = "Download YouTube";
 $lang['cardFormYTLabel'] = "YouTube URL (single clip or playlist)";
@@ -311,5 +316,6 @@ $lang['filterfile'] = "Fichiers";
 $lang['filterlivestream'] = "Livestream";
 $lang['filterpodcast'] = "Podcast";
 $lang['filterspotify'] = "Spotify";
+$lang['filteraudiobookshelf'] = "Audiobookshelf";
 $lang['filteryoutube'] = "YouTube";
 ?>

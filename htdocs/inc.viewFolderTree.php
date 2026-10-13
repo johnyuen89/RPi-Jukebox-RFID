@@ -108,6 +108,14 @@ foreach($subfolders as $key => $subfolder) {
             $temp['type'] = "podcast";
         } elseif(file_exists($subfolder."/livestream.txt")){
             $temp['type'] = "livestream";
+        } elseif(file_exists($subfolder."/audiobookshelf.txt")){
+            $temp['type'] = "audiobookshelf";
+            $titlefile = $subfolder."/title.txt";
+            $coverfile = $subfolder."/cover.jpg";
+            if (!file_exists($coverfile) || !file_exists($titlefile)) {
+                $uri = trim(file_get_contents($subfolder."/audiobookshelf.txt"));
+                absWriteTitleAndCover($subfolder, $uri);
+            }
         } elseif(file_exists($subfolder."/spotify.txt")){
             $temp['type'] = "spotify";
             $titlefile = $subfolder."/title.txt";

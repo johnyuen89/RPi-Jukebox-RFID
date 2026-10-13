@@ -68,6 +68,10 @@ case "$COMMAND" in
 savepos)
     # Get folder name of currently played audio 
     FOLDER=$(cat $PATHDATA/../settings/Latest_Folder_Played)
+    # Audiobookshelf progress is stored on the server, not in folder.conf.
+    if [ -f "$AUDIOFOLDERSPATH/$FOLDER/audiobookshelf.txt" ]; then
+        if [ "${DEBUG_resume_play_sh}" == "TRUE" ]; then echo "  savepos skipped: Audiobookshelf owns progress for $FOLDER" >> $PATHDATA/../logs/debug.log; fi
+    else
     # Read the current config file (include will execute == read)
     . "$AUDIOFOLDERSPATH/$FOLDER/folder.conf"
     if [ "${DEBUG_resume_play_sh}" == "TRUE" ]; then echo "VAR FOLDER from settings/Latest_Folder_Played: $FOLDER" >> $PATHDATA/../logs/debug.log; fi
@@ -97,8 +101,14 @@ savepos)
         fi
     fi
     if [ "${DEBUG_resume_play_sh}" == "TRUE" ]; then cat "$AUDIOFOLDERSPATH/$FOLDER/folder.conf" >> $PATHDATA/../logs/debug.log; fi
+    fi
     ;;
 resume)
+    # Audiobookshelf resume is applied by the Mopidy extension, not folder.conf.
+    if [ -f "$AUDIOFOLDERSPATH/$FOLDER/audiobookshelf.txt" ]; then
+        if [ "${DEBUG_resume_play_sh}" == "TRUE" ]; then echo "  resume: Audiobookshelf folder, play without local position" >> $PATHDATA/../logs/debug.log; fi
+        echo -e "play $VALUE" | nc -w 1 localhost 6600
+    else
     # Read the current config file (include will execute == read)
     # read vars from folder.conf
     . "$AUDIOFOLDERSPATH/$FOLDER/folder.conf"
@@ -153,6 +163,7 @@ resume)
     else
         # if no last played data exists (resume play disabled), we play the playlist from the beginning or the given playlist position
         echo -e "play $VALUE" | nc -w 1 localhost 6600
+    fi
     fi
     ;;
 enableresume)

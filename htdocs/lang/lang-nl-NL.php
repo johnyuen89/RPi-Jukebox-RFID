@@ -111,6 +111,8 @@ $lang['cardRegisterErrorExistingAndNew'] = "<p>Dit is te veel! Kies een bestaand
 $lang['cardRegisterErrorExistingFolder'] = "<p>Er bestaat al een map met dezelfde naam! Kies een andere.</p>";
 $lang['cardRegisterErrorSuggestFolder'] = "Er moet een mapnaam voor de stream worden gemaakt. Hieronder in het formulier heb ik een suggestie gedaan.";
 $lang['cardRegisterErrorConvertSpotifyURL'] = "Verkeerde spotify url, geconverteerd naar het juiste formaat";
+$lang['cardRegisterErrorConvertABSURL'] = "Audiobookshelf-webadres omgezet naar een audiobookshelf:-URI";
+$lang['cardRegisterErrorABSFolder'] = "De Audiobookshelf-map kon niet worden gemaakt.";
 $lang['cardRegisterStream2Card'] = "Stream is gekoppeld aan kaart-ID.";
 $lang['cardRegisterFolder2Card'] = "De audiomap is nu gekoppeld aan kaart-ID";
 $lang['cardRegisterDownloadingYT'] = "<p>YouTube-audio wordt gedownload. Dit kan een paar minuten duren. U kunt het logbestand 'youtube-download.log' in de gedeelde map controleren.</p>";
@@ -129,6 +131,9 @@ $lang['cardFormStreamPlaceholderPlusSpotify'] = "spotify:album/artist/playlist/t
 $lang['cardFormStreamHelp'] = "Voeg de URL toe voor spotify, podcast, webradio, stream of andere online media";
 $lang['cardFormStreamTypeSelectDefault'] = "Selecteer type";
 $lang['cardFormStreamTypeHelp'] = "Selecteer het type dat u toevoegt";
+$lang['cardFormABSLegend'] = "Audiobookshelf";
+$lang['cardFormABSSearchLabel'] = "Luisterboek zoeken";
+$lang['cardFormABSSearchHelp'] = "Zoek in je Audiobookshelf-bibliotheken. Een resultaat vult de stream-URL en stelt een mapnaam voor.";
 $lang['cardFormStreamFolderPlaceholder'] = "bijv. 'Album / Afspeellijst / Stationsnaam'";
 $lang['cardFormStreamFolderHelp'] = "Naam voor de audiomap die de stream-URL bevat.";
 $lang['cardFormYTLegend'] = "YouTube";
@@ -230,6 +235,7 @@ $lang['filterfile'] = "Bestanden";
 $lang['filterlivestream'] = "Livestream";
 $lang['filterpodcast'] = "Podcast";
 $lang['filterspotify'] = "Spotify";
+$lang['filteraudiobookshelf'] = "Audiobookshelf";
 $lang['filteryoutube'] = "YouTube";
 ?>
 

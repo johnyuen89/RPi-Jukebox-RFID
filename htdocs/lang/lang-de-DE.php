@@ -127,6 +127,8 @@ $lang['cardRegisterErrorExistingAndNew'] = "<p>Das ist zu viel! Wähle entweder 
 $lang['cardRegisterErrorExistingFolder'] = "<p>Ein Ordner mit dem gleichen Namen existiert bereits! Wähle einen anderen. </p>";
 $lang['cardRegisterErrorSuggestFolder'] = "Ein Ordnername für den Stream muss erstellt werden. Unten im Formular steht ein Vorschlag.";
 $lang['cardRegisterErrorConvertSpotifyURL'] = "Falsche Spotify URL, konvertiert in korrektes Format";
+$lang['cardRegisterErrorConvertABSURL'] = "Audiobookshelf-Webadresse wurde in eine audiobookshelf:-URI umgewandelt";
+$lang['cardRegisterErrorABSFolder'] = "Der Audiobookshelf-Ordner konnte nicht erstellt werden.";
 $lang['cardRegisterStream2Card'] = "Stream ist mit der Karten-ID verknüpft.";
 $lang['cardRegisterFolder2Card'] = "Audio-Ordner ist nun mit der Karten-ID verknüpft.";
 $lang['cardRegisterDownloadingYT'] = "<p>YouTube Audio wird heruntergeladen. Dies kann einige Minuten dauern. Du kannst die Logdatei \"youtube-download.log\" im Ordner \"shared\" ansehen.</p>";
@@ -156,6 +158,9 @@ $lang['cardFormStreamPlaceholderPlusSpotify'] = "spotify:album/artist/playlist/t
 $lang['cardFormStreamHelp'] = "Füge die URL für spotify, Podcast, Webradio, Stream oder andere Online-Medien hinzu";
 $lang['cardFormStreamTypeSelectDefault'] = "Wähle den Typ";
 $lang['cardFormStreamTypeHelp'] = "Wähle die Art des Streams, den du hinzufügen möchtest";
+$lang['cardFormABSLegend'] = "Audiobookshelf";
+$lang['cardFormABSSearchLabel'] = "Hörbuch suchen";
+$lang['cardFormABSSearchHelp'] = "Suche in Audiobookshelf. Ein Treffer füllt die Stream-URL und schlägt einen Ordnernamen vor.";
 
 $lang['cardFormYTLegend'] = "Von YouTube Herunterladen";
 $lang['cardFormYTLabel'] = "YouTube URL (einzelner Track oder Playlist)";
@@ -304,5 +309,6 @@ $lang['filterfile'] = "Dateien";
 $lang['filterlivestream'] = "Livestream";
 $lang['filterpodcast'] = "Podcast";
 $lang['filterspotify'] = "Spotify";
+$lang['filteraudiobookshelf'] = "Audiobookshelf";
 $lang['filteryoutube'] = "YouTube";
 ?>

@@ -321,6 +321,10 @@ function index_folders_print($item, $key)
 	if (in_array($contentTree[$key]['path_abs']."/spotify.txt", $contentTree[$key]['files'])) {
 		print "
       <div class='filterDiv spotify col-md-12'>";
+
+	} elseif (in_array($contentTree[$key]['path_abs']."/audiobookshelf.txt", $contentTree[$key]['files'])) {
+		print "
+      <div class='filterDiv audiobookshelf col-md-12'>";
 	  
 	} elseif (in_array($contentTree[$key]['path_abs']."/livestream.txt", $contentTree[$key]['files'])) {
 		print "
@@ -363,7 +367,7 @@ function index_folders_print($item, $key)
         print "
               <a onclick='playPlaylist(\"$playlist\", \"true\");' class='btn-panel-big btn-panel-col pb-plist-play' title='Play (sub)folders'><i class='mdi mdi-animation-play-outline'></i></a>";
     }
-	if (!in_array($contentTree[$key]['path_abs']."/livestream.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/spotify.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/podcast.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/youtube.txt", $contentTree[$key]['files']) ) {
+	if (!in_array($contentTree[$key]['path_abs']."/livestream.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/spotify.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/audiobookshelf.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/podcast.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/youtube.txt", $contentTree[$key]['files']) ) {
 
 	    print "
 				  <span class='mb-0 playlist_headline' data-toggle='collapse' data-target='#collapse".$id."' aria-expanded='true' aria-controls='collapse".$id."' style='cursor:pointer;' title='Show contents'>";
@@ -380,6 +384,13 @@ function index_folders_print($item, $key)
               </span>";
 	} elseif (in_array($contentTree[$key]['path_abs']."/spotify.txt", $contentTree[$key]['files'])) {
 		print '<i class="mdi mdi-spotify mdi-36px"></i> ';
+		if (file_exists($contentTree[$key]['path_abs']."/title.txt")) {
+		print file_get_contents($contentTree[$key]['path_abs']."/title.txt");
+		} else {
+		print $contentTree[$key]['basename'];
+		}
+	} elseif (in_array($contentTree[$key]['path_abs']."/audiobookshelf.txt", $contentTree[$key]['files'])) {
+		print '<i class="mdi mdi-book-open-variant mdi-36px"></i> ';
 		if (file_exists($contentTree[$key]['path_abs']."/title.txt")) {
 		print file_get_contents($contentTree[$key]['path_abs']."/title.txt");
 		} else {
@@ -410,8 +421,8 @@ function index_folders_print($item, $key)
     } else {
         print "\n                <div><!-- settings buttons -->";
         // RESUME BUTTON
-        // do not show any if there is a live stream in the folder
-        if (!in_array($contentTree[$key]['path_abs']."/livestream.txt", $contentTree[$key]['files']) ) {
+        // Live streams have no position. Audiobookshelf stores its own.
+        if (!in_array($contentTree[$key]['path_abs']."/livestream.txt", $contentTree[$key]['files']) && !in_array($contentTree[$key]['path_abs']."/audiobookshelf.txt", $contentTree[$key]['files']) ) {
             $foundResume = "OFF";
             if(
                 file_exists($contentTree[$key]['path_abs']."/folder.conf")
@@ -578,7 +589,7 @@ function printPlaylistHtml($files)
                 <a onclick='playSingleFile(\"".htmlspecialchars($file,ENT_QUOTES)."\");' class='btn-panel-small btn-panel-col pb-plist-play' title='Play song' style='cursor: pointer'><i class='mdi mdi-play-circle-outline'></i></a>
                 <a onclick='appendFileToPlaylist(\"".htmlspecialchars($file,ENT_QUOTES)."\");' class='btn-panel-small btn-panel-col pb-plist-play' title='Append song to playlist' style='cursor: pointer'><i class='mdi mdi-plus-circle-outline'></i></a>
                     <strong>".htmlspecialchars(basename($file),ENT_QUOTES)."</strong>";
-        if(basename($file) != "livestream.txt" && basename($file) != "podcast.txt" && basename($file) != "spotify.txt") {
+        if(basename($file) != "livestream.txt" && basename($file) != "podcast.txt" && basename($file) != "spotify.txt" && basename($file) != "audiobookshelf.txt") {
             print"
                     &nbsp;&nbsp; <a href='trackEdit.php?folder=".htmlspecialchars(dirname($file),ENT_QUOTES)."&filename=".htmlspecialchars(basename($file),ENT_QUOTES)."' class='pb-plist-play'><i class='mdi mdi-text'></i> ".$lang['globalEdit']."</a>";
         }
@@ -587,6 +598,101 @@ function printPlaylistHtml($files)
     }
     print "
             </ol>";
+}
+
+function mopidyJsonRpc($method, $params) {
+    /*
+    * JSON-RPC via PHP streams. Safe for user-supplied params, unlike mopidyApiCall().
+    */
+    $payload = json_encode(array(
+        "jsonrpc" => "2.0",
+        "id" => 1,
+        "method" => $method,
+        "params" => $params,
+    ));
+    $context = stream_context_create(array(
+        "http" => array(
+            "method" => "POST",
+            "header" => "Content-Type: application/json\r\n",
+            "content" => $payload,
+            "timeout" => 15,
+            "ignore_errors" => true,
+        ),
+    ));
+    $raw = @file_get_contents("http://localhost:6680/mopidy/rpc", false, $context);
+    if($raw === false) {
+        return null;
+    }
+    $decoded = json_decode($raw, true);
+    if(!is_array($decoded)) {
+        return null;
+    }
+    return $decoded;
+}
+
+function absRegisterCard($audioRoot, $shortcutsDir, $cardId, $folderName, $uri) {
+    /*
+    * Create the card folder in PHP. Book titles often contain apostrophes,
+    * which break the shell mkdir/echo used for other stream types.
+    */
+    $folderName = str_replace("\0", "", (string) $folderName);
+    $uri = trim((string) $uri);
+    if ($folderName === "" || $uri === "" || strpos($folderName, "..") !== false) {
+        return false;
+    }
+    $folder = rtrim($audioRoot, "/\\") . "/" . $folderName;
+    if (!is_dir($folder) && !mkdir($folder, 0777, true)) {
+        return false;
+    }
+    $written = file_put_contents($folder . "/audiobookshelf.txt", $uri . "\n");
+    if ($written === false) {
+        return false;
+    }
+    $folderConf = "CURRENTFILENAME=\"filename\"\n"
+        . "ELAPSED=\"0\"\n"
+        . "PLAYSTATUS=\"Stopped\"\n"
+        . "RESUME=\"OFF\"\n"
+        . "SHUFFLE=\"OFF\"\n"
+        . "LOOP=\"OFF\"\n"
+        . "SINGLE=\"OFF\"\n";
+    file_put_contents($folder . "/folder.conf", $folderConf);
+    $shortcut = rtrim($shortcutsDir, "/\\") . "/" . $cardId;
+    file_put_contents($shortcut, $folderName . "\n");
+    @chmod($folder, 0777);
+    @chmod($folder . "/audiobookshelf.txt", 0777);
+    @chmod($folder . "/folder.conf", 0777);
+    @chmod($shortcut, 0777);
+    absWriteTitleAndCover($folder, $uri);
+    return true;
+}
+
+function absWriteTitleAndCover($folder, $uri) {
+    /*
+    * Save the book title and cover next to audiobookshelf.txt.
+    * Lookup goes through Mopidy so this PHP app never stores the ABS token.
+    */
+    if($uri === "" || !is_dir($folder)) {
+        return;
+    }
+    $lookup = mopidyJsonRpc("core.library.lookup", array("uris" => array($uri)));
+    $title = "";
+    if(isset($lookup["result"][$uri][0]["album"]["name"])) {
+        $title = trim($lookup["result"][$uri][0]["album"]["name"]);
+    }
+    if($title !== "") {
+        file_put_contents($folder."/title.txt", $title);
+    }
+    $images = mopidyJsonRpc("core.library.get_images", array("uris" => array($uri)));
+    $imageUri = "";
+    if(isset($images["result"][$uri][0]["uri"])) {
+        $imageUri = $images["result"][$uri][0]["uri"];
+    }
+    if($imageUri !== "") {
+        $image = @file_get_contents($imageUri);
+        if($image !== false && $image !== "") {
+            file_put_contents($folder."/cover.jpg", $image);
+        }
+    }
 }
 
 function mopidyApiCall($method, $params){

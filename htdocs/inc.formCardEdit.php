@@ -178,6 +178,9 @@ fclose($fn);
 				print "<option value='spotify'";
 				if($fpost['streamType'] == "spotify") { print " selected=selected"; }
 				print ">Spotify</option>";
+				print "<option value='audiobookshelf'";
+				if($fpost['streamType'] == "audiobookshelf") { print " selected=selected"; }
+				print ">Audiobookshelf</option>";
 			  }
 			  ?>
               <option value='podcast'<?php if($fpost['streamType'] == "podcast") { print " selected=selected"; } ?>>Podcast</option>
@@ -191,6 +194,23 @@ fclose($fn);
         
         </fieldset>
 
+<?php if ($edition == "plusSpotify") { ?>
+<!-----------------------------------------
+- Audiobookshelf book picker
+-->
+        <fieldset>
+        <legend><?php print $lang['cardFormABSLegend']; ?></legend>
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="absSearch"><?php print $lang['cardFormABSSearchLabel']; ?></label>
+          <div class="col-md-6">
+          <input id="absSearch" name="absSearch" placeholder="<?php print $lang['cardFormABSSearchLabel']; ?>" class="form-control input-md" type="text" autocomplete="off">
+          <span class="help-block"><?php print $lang['cardFormABSSearchHelp']; ?></span>
+          <div id="absResults" class="list-group"></div>
+          </div>
+        </div>
+        </fieldset>
+        <script src="js/audiobookshelf.js"></script>
+<?php } ?>
 
 <!-----------------------------------------
 - YouTube

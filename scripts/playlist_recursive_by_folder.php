@@ -148,6 +148,12 @@ foreach($folders as $folder) {
             */
             $spotifyURL = file_get_contents($folder."/spotify.txt");
             $folder_files = array($spotifyURL);
+        } elseif(file_exists($folder."/audiobookshelf.txt")) {
+            /*
+            * One audiobookshelf:book:<id> URI. Mopidy expands it to the book's tracks.
+            */
+            $absURI = trim(file_get_contents($folder."/audiobookshelf.txt"));
+            $folder_files = array($absURI);
         } else {
             /*
             * ordinary, local files

@@ -105,6 +105,7 @@ include("inc.setVolume.php");
 				  <button class="filterbtn" onclick="filterSelection('livestream')"> <?php print $lang['filterlivestream']; ?></button>
 				  <button class="filterbtn" onclick="filterSelection('podcast')"> <?php print $lang['filterpodcast']; ?></button>
 				  <button class="filterbtn" onclick="filterSelection('spotify')"> <?php print $lang['filterspotify']; ?></button>
+				  <button class="filterbtn" onclick="filterSelection('audiobookshelf')"> <?php print $lang['filteraudiobookshelf']; ?></button>
 				  <button class="filterbtn" onclick="filterSelection('youtube')"> <?php print $lang['filteryoutube']; ?></button>
 			</div>
       <div class="filtercontainer row">

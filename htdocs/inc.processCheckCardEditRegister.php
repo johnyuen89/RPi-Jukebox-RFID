@@ -171,6 +171,15 @@ if($post['delete'] == "delete") {
         $post['audiofolderNew'] = $link = str_replace(array('http://','https://','/','=','-','.', 'www','?','&'), '', $post['streamURL']);
     }
 
+    // Audiobookshelf web URLs are not playable URIs. Convert and ask the user to submit again.
+    if(isset($post['streamURL']) && $post['streamType'] == "audiobookshelf" && preg_match('#/item/([^/?#]+)#', $post['streamURL'], $absMatch)){
+        $absUri = "audiobookshelf:book:".$absMatch[1];
+        if($absUri !== trim($post['streamURL'])) {
+            $messageError .= $lang['cardRegisterErrorConvertABSURL']." (error 008)<br />".$post['streamURL']." ➔ ".$absUri;
+            $post['streamURL'] = $absUri;
+        }
+    }
+
     //wrong spotify url, convert to mopidy format
     if((isset($post['streamURL']) && $post['streamType'] == "spotify") && (strpos($post['streamURL'], "https://open.spotify.com/") !== false)){
         $patterns = array();
@@ -201,6 +210,20 @@ if($post['delete'] == "delete") {
             */
             // 20200512 included code from removed the old include('inc.processAddNewStream.php');
 
+            if($post['streamType'] == "audiobookshelf") {
+                $created = absRegisterCard(
+                    $Audio_Folders_Path,
+                    $conf['shared_abs']."/shortcuts",
+                    $post['cardID'],
+                    $post['audiofolderNew'],
+                    trim($post['streamURL'])
+                );
+                if($created) {
+                    $messageSuccess = "<p>".$lang['cardRegisterStream2Card']." ".$lang['globalFolder']." '".$post['audiofolderNew']."' ".$lang['globalCardId']." '".$post['cardID']."'</p>";
+                } else {
+                    $messageError .= $lang['cardRegisterErrorABSFolder'];
+                }
+            } else {
             // create new folder
             $streamfolder = $Audio_Folders_Path."/".$post['audiofolderNew']."/";
             $exec = "mkdir -p '".$streamfolder."'";
@@ -229,6 +252,7 @@ if($post['delete'] == "delete") {
             exec($exec);
             // success message
             $messageSuccess = "<p>".$lang['cardRegisterStream2Card']." ".$lang['globalFolder']." '".$post['audiofolderNew']."' ".$lang['globalCardId']." '".$post['cardID']."'</p>";
+            }
         }
         elseif(isset($post['TriggerCommand']) && trim($post['TriggerCommand']) != "false") {
             /*******************************************************
