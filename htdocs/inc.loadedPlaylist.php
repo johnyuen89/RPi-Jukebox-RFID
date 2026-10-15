@@ -220,6 +220,88 @@
         </td>
     </tr>
 </table>
+<div id="absCacheProgress" style="display: none; margin: 0 0 16px;">
+    <div id="absCacheText" style="font-size: 12px; color: #aaa; margin-bottom: 4px;"></div>
+    <div id="absCacheTrack" style="display: none; background: #333; border-radius: 4px; height: 8px; overflow: hidden;">
+        <div id="absCacheBar" style="background: #00bc8c; height: 8px; width: 0;"></div>
+    </div>
+</div>
+<script>
+    var absCachePollBusy = false;
+
+    function formatCacheBytes(bytes) {
+        var n = Number(bytes);
+        if (!isFinite(n) || n < 0) {
+            return "";
+        }
+        if (n >= 1048576) {
+            return (n / 1048576).toFixed(1) + " MB";
+        }
+        if (n >= 1024) {
+            return (n / 1024).toFixed(1) + " KB";
+        }
+        return Math.round(n) + " B";
+    }
+
+    function renderAbsCacheProgress(data) {
+        var box = document.getElementById("absCacheProgress");
+        if (!box) {
+            return;
+        }
+        if (!data || data.active !== true) {
+            box.style.display = "none";
+            return;
+        }
+        var text = "Caching";
+        var done = formatCacheBytes(data.bytes_done);
+        var total = data.bytes_total == null ? "" : formatCacheBytes(data.bytes_total);
+        if (data.percent != null) {
+            text += " " + data.percent + "%";
+        }
+        if (done && total) {
+            text += " (" + done + " / " + total + ")";
+        } else if (done) {
+            text += " (" + done + ")";
+        }
+        document.getElementById("absCacheText").textContent = text;
+        var track = document.getElementById("absCacheTrack");
+        var bar = document.getElementById("absCacheBar");
+        if (data.percent != null) {
+            track.style.display = "block";
+            bar.style.width = Math.max(0, Math.min(100, Number(data.percent))) + "%";
+        } else {
+            track.style.display = "none";
+        }
+        box.style.display = "block";
+    }
+
+    function pollAbsCacheProgress() {
+        if (absCachePollBusy || !$("#absCacheProgress").length) {
+            return;
+        }
+        absCachePollBusy = true;
+        $.ajax({
+            url: "api/audiobookshelf-cache.php",
+            dataType: "json",
+            cache: false,
+            timeout: 2000
+        }).done(function (data) {
+            renderAbsCacheProgress(data);
+        }).fail(function () {
+            renderAbsCacheProgress(null);
+        }).always(function () {
+            absCachePollBusy = false;
+        });
+    }
+
+    $(function () {
+        if (!$("#absCacheProgress").length) {
+            return;
+        }
+        pollAbsCacheProgress();
+        setInterval(pollAbsCacheProgress, 2000);
+    });
+</script>
 <div id="collapse1" class="panel-collapse collapse" style="margin-bottom: 40px;">
     <ul class="list-group" style="list-style: none;">
         <li>
