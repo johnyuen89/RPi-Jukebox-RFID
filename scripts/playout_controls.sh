@@ -906,7 +906,14 @@ case $COMMAND in
 
         # load playlist
         mpc clear
-        mpc load "${VALUE//\//SLASH}"
+        # Mopidy rejects `mpc load` for an audiobookshelf: URI ("too many arguments"),
+        # so a card swipe never starts. Add the book URI directly; Mopidy expands it.
+        if [ -f "$AUDIOFOLDERSPATH/$FOLDER/audiobookshelf.txt" ]; then
+            ABSURI=$(head -n 1 "$AUDIOFOLDERSPATH/$FOLDER/audiobookshelf.txt" | tr -d '\r')
+            mpc add "$ABSURI"
+        else
+            mpc load "${VALUE//\//SLASH}"
+        fi
         if [ "${DEBUG_playout_controls_sh}" == "TRUE" ]; then echo "mpc load "${VALUE//\//SLASH} >> ${PATHDATA}/../logs/debug.log; fi
 
         # Change some settings according to current folder IF the folder.conf exists
