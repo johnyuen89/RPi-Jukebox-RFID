@@ -149,7 +149,18 @@ if($post['delete'] == "delete") {
     }
 
     // audiofolder already exists
-    if(isset($post['audiofolderNew']) && file_exists($Audio_Folders_Path.'/'.$post['audiofolderNew'])) {
+    // An Audiobookshelf folder may already be on disk while the shortcut still
+    // holds only the card id (the first swipe creates that file, and the save
+    // could not overwrite it). Allow that save through so the shortcut is replaced.
+    $absTarget = "";
+    $absReuse = false;
+    if(isset($post['audiofolderNew'])) {
+        $absTarget = $Audio_Folders_Path.'/'.$post['audiofolderNew'];
+        $absReuse = isset($post['streamType']) && $post['streamType'] == "audiobookshelf"
+            && is_dir($absTarget)
+            && is_file($absTarget.'/audiobookshelf.txt');
+    }
+    if(isset($post['audiofolderNew']) && file_exists($absTarget) && !$absReuse) {
         $messageError .= $lang['cardRegisterErrorExistingFolder']." (error 004)";
     }
 

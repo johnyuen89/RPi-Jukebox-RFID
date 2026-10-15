@@ -656,14 +656,54 @@ function absRegisterCard($audioRoot, $shortcutsDir, $cardId, $folderName, $uri) 
         . "LOOP=\"OFF\"\n"
         . "SINGLE=\"OFF\"\n";
     file_put_contents($folder . "/folder.conf", $folderConf);
-    $shortcut = rtrim($shortcutsDir, "/\\") . "/" . $cardId;
-    file_put_contents($shortcut, $folderName . "\n");
+    if (!absWriteShortcut($shortcutsDir, $cardId, $folderName)) {
+        return false;
+    }
     @chmod($folder, 0777);
     @chmod($folder . "/audiobookshelf.txt", 0777);
     @chmod($folder . "/folder.conf", 0777);
-    @chmod($shortcut, 0777);
     absWriteTitleAndCover($folder, $uri);
     return true;
+}
+
+function absWriteShortcut($shortcutsDir, $cardId, $folderName) {
+    /*
+    * Point shared/shortcuts/<cardId> at the folder that holds audiobookshelf.txt.
+    *
+    * The RFID reader creates that file on the first swipe, owned by pi, containing
+    * only the card id (rfid_trigger_play.sh). It is often mode 644, so www-data
+    * cannot open it for writing and file_put_contents leaves the card id in place.
+    * The book folder is still created, and a swipe looks for audiofolders/<cardId>.
+    * Unlink needs write permission on the directory, not on the file, then create
+    * the shortcut again with the human folder name.
+    */
+    $cardId = str_replace("\0", "", (string) $cardId);
+    $folderName = str_replace("\0", "", (string) $folderName);
+    if ($cardId === "" || $folderName === ""
+        || strpos($cardId, "/") !== false || strpos($cardId, "\\") !== false
+        || strpos($folderName, "..") !== false
+    ) {
+        return false;
+    }
+    $dir = rtrim((string) $shortcutsDir, "/\\");
+    if ($dir === "") {
+        return false;
+    }
+    if (!is_dir($dir) && !mkdir($dir, 0777, true)) {
+        return false;
+    }
+    $shortcut = $dir . "/" . $cardId;
+    if (is_file($shortcut) && !@unlink($shortcut)) {
+        @chmod($shortcut, 0666);
+        if (!@unlink($shortcut)) {
+            return false;
+        }
+    }
+    if (file_put_contents($shortcut, $folderName . "\n") === false) {
+        return false;
+    }
+    @chmod($shortcut, 0777);
+    return trim((string) file_get_contents($shortcut)) === $folderName;
 }
 
 function absWriteTitleAndCover($folder, $uri) {
